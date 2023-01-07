@@ -1,0 +1,13 @@
+version: '3'
+services:
+  mxgo_services:
+    image: nodejs
+    command: npm run dev
+    container_name: nodejs
+    restart: unless-stopped
+    # env_file: .env
+
+    ports:
+      - "80:3333"
+    volumes:
+      - ./dist:/home/node/app
