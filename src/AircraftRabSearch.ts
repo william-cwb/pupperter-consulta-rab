@@ -2,8 +2,9 @@ import puppeteer, { Browser, Page } from "puppeteer"
 
 interface Rab {
     owner: string,
-    cpf_cnpj: string,
+    document_owner: string,
     operator: string,
+    document_operator: string,
     manufacturer: string,
     year: string,
     model: string,
@@ -21,8 +22,16 @@ interface Rab {
 export default async function AircraftRabSearch(registration: string): Promise<Rab>{
 
     const url = `https://sistemas.anac.gov.br/aeronaves/cons_rab_resposta.asp?textMarca=${registration}&selectHabilitacao=&selectIcao=&selectModelo=&selectFabricante=&textNumeroSerie=`;
+    console.log(">>>>>>AAAAAA>>>>>>>>")
 
-    const browser: Browser = await puppeteer.launch({});
+    const browser: Browser = await puppeteer.launch({
+      headless: true,
+      executablePath: process.env.CHROMIUM_PATH,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ]
+    });
     const page: Page = await browser.newPage();
 
     await new Promise((r) => setTimeout(r, 1000));
@@ -30,11 +39,14 @@ export default async function AircraftRabSearch(registration: string): Promise<R
     await page.goto(url);
 
     return await page.evaluate(() => {
+
       const columns: Array<string>  = [];
+
       const data: Rab = {
         owner: "",
-        cpf_cnpj: "",
+        document_owner: "",
         operator: "",
+        document_operator: "",
         manufacturer: "",
         year: "",
         model: "",
@@ -49,27 +61,27 @@ export default async function AircraftRabSearch(registration: string): Promise<R
         issuance_date: "",
       };
 
-    //   const th: Array<HTMLElement> = Array.from(document.querySelectorAll(".table.table-hover th"));
-    //   th.map((t: HTMLElement) => columns.push(t.innerText));
+    
       const td: Array<HTMLElement> = Array.from(document.querySelectorAll(".table.table-hover td"));
 
       const values = td.map((t) => t.innerText);
 
       data.owner = values[0];
-      data.cpf_cnpj = values[1];
+      data.document_owner = values[1];
       data.operator = values[2];
-      data.manufacturer = values[3];
-      data.year = values[4];
-      data.model = values[5];
-      data.serial_number = values[6];
-      data.icao = values[7];
-      data.type_habilitation = values[8];
-      data.class_aircraft = values[9];
-      data.max_weight = values[10];
-      data.max_passengers = values[11];
-      data.type_authorized = values[12];
-      data.status_operation = values[15];
-      data.issuance_date = values[18];
+      data.document_operator = values[3];
+      data.manufacturer = values[4];
+      data.year = values[5];
+      data.model = values[6];
+      data.serial_number = values[7];
+      data.icao = values[8];
+      data.type_habilitation = values[9];
+      data.class_aircraft = values[10];
+      data.max_weight = values[11];
+      data.max_passengers = values[12];
+      data.type_authorized = values[13];
+      data.status_operation = values[16];
+      data.issuance_date = values[19];
 
       return data;
     });    

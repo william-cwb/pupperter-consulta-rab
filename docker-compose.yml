@@ -1,13 +1,13 @@
 version: '3'
 services:
-  mxgo_services:
-    image: nodejs
-    command: npm run dev
-    container_name: nodejs
-    restart: unless-stopped
-    # env_file: .env
-
-    ports:
-      - "80:3333"
+  web:
+    image: node:18.x # Imagem base do Docker para o Node.js
+    build: ./dist
+    working_dir: /app # Diretório de trabalho dentro do contêiner
     volumes:
-      - ./dist:/home/node/app
+      - ./dist:/app # Mapeamento do diretório do host para o diretório de trabalho do contêiner
+    ports:
+      - "3000:3000" # Porta do host:porta do contêiner
+    environment:
+      - NODE_ENV=production # Defina a variável de ambiente NODE_ENV para 'production'
+    command: node index.js # Comando para iniciar o aplicativo Node.js
